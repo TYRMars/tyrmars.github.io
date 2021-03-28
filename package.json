@@ -1,0 +1,24 @@
+{
+  "name": "tyrmars.github.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TYRMars/tyrmars.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TYRMars/tyrmars.github.io/issues"
+  },
+  "homepage": "https://github.com/TYRMars/tyrmars.github.io#readme",
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  }
+}
