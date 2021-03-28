@@ -2,6 +2,9 @@ module.exports = {
   title: 'My Space',
   description: 'stay hungry stay foolish',
   sidebar: 'auto',
+  markdown: {
+    lineNumbers: true
+  },
   themeConfig: {
     nav: [
       { text: '主页', link: '/' },
