@@ -15,3 +15,7 @@ title: 文章收藏
 ## Canvas
 
 [跨平台Web Canvas渲染引擎架构的设计与思考(内含实现方案)](https://mp.weixin.qq.com/s/-_4KZx54DblCylzh-kjJtw)
+
+## 前端性能
+
+[用 Service Worker 实现前端性能优化](https://mp.weixin.qq.com/s/re7W1YFXkd-JHREo8J6s2A)
