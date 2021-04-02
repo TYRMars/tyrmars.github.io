@@ -15,6 +15,7 @@ module.exports = {
           { text: '前端安全', link: '/fe/safe/' },
           { text: '前端工具', link: '/fe/tool/' },
           { text: '文章收藏', link: '/fe/collect/' },
+          { text: '知识学习', link: '/fe/knowledge/' },
         ]
       },
       { text: '博客', link: '/blog/' },
