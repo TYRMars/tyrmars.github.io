@@ -3,6 +3,12 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-04-06 日记
+
+### 组件设计
+
+今天有一个需求，需要在移动端实现NumberPicker
+
 ## 2021-04-05 日记
 
 ### Array.from 与 Array.fill
