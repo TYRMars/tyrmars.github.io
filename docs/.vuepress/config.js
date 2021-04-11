@@ -8,14 +8,16 @@ module.exports = {
   themeConfig: {
     nav: [
       { text: '主页', link: '/' },
+      { text: '文章收藏', link: '/fe/collect/' },
       {
         text: '前端知识',
-        ariaLabel: 'FE Knowlage',
         items: [
+          { text: 'React', link: '/fe/react/' },
+          { text: 'Node.js', link: '/fe/node/' },
+          { text: 'css', link: '/fe/css/' },
           { text: '前端安全', link: '/fe/safe/' },
           { text: '前端工具', link: '/fe/tool/' },
-          { text: '文章收藏', link: '/fe/collect/' },
-          { text: '知识学习', link: '/fe/knowledge/' },
+          { text: '其他知识', link: '/fe/knowledge/' },
         ]
       },
       { text: '博客', link: '/blog/' },

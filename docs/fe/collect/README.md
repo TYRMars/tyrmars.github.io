@@ -1,5 +1,6 @@
 ---
 title: 文章收藏
+sidebar: auto
 ---
 
 ::: tip

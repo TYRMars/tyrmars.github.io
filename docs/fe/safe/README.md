@@ -3,8 +3,6 @@ title: Web前后端漏洞分析与防御
 sidebar: auto
 ---
 
-# Web前后端漏洞分析与防御-知识梳理📖
-
 ## 01-01 HTTP协议
 
 * HTTP协议的主要特点
@@ -25,9 +23,9 @@ sidebar: auto
 ### HTTP报文
 
 * HTTP请求报文：请求行、请求头、空行、请求体
-    * 请求行：包含HTTP方法、页面地址、HTTP协议、以及版本
-    * 请求头：Key-Value值告诉服务端我需要哪些内容
-    * 空行：下一个是请求体，需要解析
+  * 请求行：包含HTTP方法、页面地址、HTTP协议、以及版本
+  * 请求头：Key-Value值告诉服务端我需要哪些内容
+  * 空行：下一个是请求体，需要解析
 * HTTP相应报文：状态行、响应头、空行、响应体
 
 ### POST和GET的区别
@@ -46,20 +44,20 @@ sidebar: auto
 
 * 1XX：指示信息-表示请求已接受，继续处理
 * 2XX：成功-表示请求已被成功接收
-    * 200 OK ：客户端请求成功
-    * 206 Partial Content：客户发送一个带有Range头的GET请求，服务器完成了它 播放视频和音频
+  * 200 OK ：客户端请求成功
+  * 206 Partial Content：客户发送一个带有Range头的GET请求，服务器完成了它 播放视频和音频
 * 3XX：重定向-要完成请求必须进行更进一步的操作
-    * 301 Move Permanently：所请求的页面已经转移至新的URL
+  * 301 Move Permanently：所请求的页面已经转移至新的URL
     * 302 Found：所请求的页面已经临时转移到新的URL
     * 304 Not Modified：客户端有缓冲的文档并发出一个条件性的请求，服务器告诉客户，原来缓冲的文档还可以继续使用
 * 4XX：客户端错误-请求有语法错误或请求无法实现
-    * 400 Bad Request：客户端请求有语法错误，不能被服务器所理解
-    * 401 Unauthorized：请求未经授权，这个状态代码必须和WWW-Authenticate报头域一起使用
-    * 403 Forbidden：对被请求页面的访问被禁止
-    * 404 Not Found：请求资源不存在
+  * 400 Bad Request：客户端请求有语法错误，不能被服务器所理解
+  * 401 Unauthorized：请求未经授权，这个状态代码必须和WWW-Authenticate报头域一起使用
+  * 403 Forbidden：对被请求页面的访问被禁止
+  * 404 Not Found：请求资源不存在
 * 5XX：服务错误-服务器未能实现合法的请求
-    * 500 Internal Server Error：服务器发生不可预期的错误原来缓冲的文档还可以继续使用
-    * 503 Server Unavailable：请求未完成，服务器临时过载或当机，一段事件后恢复正常
+  * 500 Internal Server Error：服务器发生不可预期的错误原来缓冲的文档还可以继续使用
+  * 503 Server Unavailable：请求未完成，服务器临时过载或当机，一段事件后恢复正常
 
 ### HTTP 持久连接 (HTTP1.1)
 
@@ -89,9 +87,9 @@ sidebar: auto
 ### 同源策略及限制
 
 * 同源限制从一个源加载的文档或脚本如何于来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的关键的安全机制。
-    * Cookie、LocalStorage和IndexDB无法读取
-    * DOM无法读取
-    * AJAX不能发送请求
+  * Cookie、LocalStorage和IndexDB无法读取
+  * DOM无法读取
+  * AJAX不能发送请求
 
 ### 前后端如何通信
 
@@ -147,7 +145,7 @@ function ajax(url,fnSucc,fnFaild) {
 <script>
 jsonp({
   data:{
-  	<!-- 全局函数接受回掉信息 -->
+   <!-- 全局函数接受回掉信息 -->
   }
 })
 </script>
@@ -262,7 +260,7 @@ ws.onclose = function(evt) {
 ```javascript
 // url (必须), options (可选)
 fetch('/some/url',{
-	method: 'get',
+ method: 'get',
 }).then(function(response) {
 
 }).catch(function(err) {
@@ -287,8 +285,8 @@ fetch('/some/url',{
 ### XSS攻击原理
 
 * 程序+数据=结果
-    * `<div>#{content}</div>`=>`content:Hello world!`=>`<div>Hello world</div>`
-    * `<div>#{content}</div>`=>`content:<script>alert(1)</script>`=>`<div><script>alert(1)</script></div>`
+  * `<div>#{content}</div>`=>`content:Hello world!`=>`<div>Hello world</div>`
+  * `<div>#{content}</div>`=>`content:<script>alert(1)</script>`=>`<div><script>alert(1)</script></div>`
 
 ### XSS攻击危害
 
@@ -327,8 +325,8 @@ fetch('/some/url',{
 ## 02-02 XSS攻击类型
 
 * 基本可以分为
-    * 反射型
-    * 存储型
+  * 反射型
+  * 存储型
 
 ### 反射型
 
@@ -405,7 +403,6 @@ var from = "Google"//此段代码是传递到页面上
 </script>
 ```
 
-
 1. URL中由数据库获取传递`id`:`http://loacalhost:8080/?from=Google`
 
 ```HTML
@@ -428,10 +425,12 @@ var from = "Google";alert(1);""//此段代码是传递到页面上
 * 这样`from`属性被关闭，中间会注入了`alert`，就会出现弹框！！！
 
 #### 3. 富文本
+
 * 富文本得保留HTML
 * HTML有XSS攻击风险
 
 #### 浏览器自带的XSS攻击拦截机制
+
 * 设置Header X-XSS-Protection
 * 此机制只适用于参数出现在HTML内容或属性才会去拦截
 * 只适用于反射型
@@ -616,8 +615,8 @@ worker-src：限制Worker, SharedWorker, 或者 ServiceWorker脚本源。
 
 * 禁止第三方网站带Cookies
 * Cookie新属性same-site属性
-    * SameSite = Strict 任何网站不允许携带
-    * SameSite = Lax 允许链接带上Cookie，但不允许ajax不可以带Cookie，form提交也不允许带上Cookie
+  * SameSite = Strict 任何网站不允许携带
+  * SameSite = Lax 允许链接带上Cookie，但不允许ajax不可以带Cookie，form提交也不允许带上Cookie
 
 * 只有Chrome支持
 
