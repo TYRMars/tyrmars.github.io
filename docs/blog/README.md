@@ -3,6 +3,12 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-04-11 日记
+
+### Electron 构建
+
+寻找最好的构建Electron + React方式
+
 ## 2021-04-06 日记
 
 ### 组件设计
