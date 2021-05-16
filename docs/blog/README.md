@@ -3,6 +3,42 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-05-16 日记
+
+### requestAniamtionFrame 遇到的问题
+
+window.requestAnimationFrame() 告诉浏览器——你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行。
+
+当你准备更新动画时你应该调用此方法。这将使浏览器在下一次重绘之前调用你传入给该方法的动画函数(即你的回调函数)。回调函数执行次数通常是每秒60次，但在大多数遵循W3C建议的浏览器中，回调函数执行次数通常与浏览器屏幕刷新次数相匹配。
+
+在Android 9 中出现了执行[animejs](https://animejs.com/)动画后，requestAnimationFrame会报错。
+
+自己想了一个比较好的解决方案使用
+
+```TypeScript
+// fix requestAnimationFrame in Android 9
+const requestAnimationFrameFunc = requestAnimationFrame.bind(window)
+
+let lastTime = 0
+
+window.requestAnimationFrame = (callback: FrameRequestCallback) => {
+  try {
+    return requestAnimationFrameFunc(callback)
+  } catch (e) {
+    window.requestAnimationFrame = (callback) => {
+      const currTime = new Date().getTime()
+      const timeToCall = Math.max(0, 16 - (currTime - lastTime))
+      const id = window.setTimeout(function () {
+        callback(currTime + timeToCall)
+      }, timeToCall)
+      lastTime = currTime + timeToCall
+      return id
+    }
+    return requestAnimationFrame(callback)
+  }
+}
+```
+
 ## 2021-04-14 日记
 
 字体相关
