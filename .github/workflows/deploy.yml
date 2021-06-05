@@ -10,9 +10,8 @@ env:
 
 jobs:
   blog-cicd:
-    name: Hexo blog build & deploy
+    name: vuepress blog build & deploy
     runs-on: ubuntu-latest # 使用最新的 Ubuntu 系统作为编译部署的环境
-
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -22,5 +21,5 @@ jobs:
       env:
         ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
         BRANCH: pages
-        FOLDER: .vuepress/dist
+        FOLDER: docs/.vuepress/dist
         BUILD_SCRIPT: npm install && npm run build
