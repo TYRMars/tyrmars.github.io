@@ -20,7 +20,7 @@ jobs:
     - name: Build and Deploy
       uses: TYRMars/tyrmars.github.io@master
       env:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
         BRANCH: pages
         FOLDER: .vuepress/dist
         BUILD_SCRIPT: npm install && npm run build
