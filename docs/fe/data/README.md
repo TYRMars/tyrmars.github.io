@@ -40,6 +40,11 @@ class Heap {
     if(r <= size && Arr[r] > Arr[largest]) {
       largest = r
     }
+
+    if(largest !== i) {
+      Heap.swap(Arr, i, largest)
+      Heap.maxHeapify(Arr, largest, size)
+    }
   }
 }
 ```
