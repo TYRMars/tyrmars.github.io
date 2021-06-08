@@ -17,6 +17,7 @@ module.exports = {
           { text: 'CSS', link: '/fe/css/' },
           { text: '前端安全', link: '/fe/safe/' },
           { text: '前端工具', link: '/fe/tool/' },
+          { text: '数据结构', link: '/fe/data/' },
           { text: 'RxJS', link: '/fe/rxjs/' },
           { text: '其他知识', link: '/fe/knowledge/' },
         ]
