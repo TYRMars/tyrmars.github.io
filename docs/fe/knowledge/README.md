@@ -32,3 +32,54 @@ lerna就是针对以上问题，在使用 git 和 npm 管理多软件包代码�
 ## plop 使用
 
 Plop是一个小工具，它可以节省您的时间，并帮助您的团队构建具有一致性的新文件。
+
+## canvas 学习
+
+```js
+const canvas = document.getElementById("canvas");
+
+canvas.width = 1024;
+canvas.height = 768;
+
+const context = canvas.getContext("2d");
+```
+
+
+### 绘制直线
+
+moveTo与lineTo是状态设置，stroke是最终来画
+
+* moveTo 是起始点
+* lineTo 是线段位置
+
+```js
+context.moveTo(100,100)
+context.lineTo(700,700)
+context.lineWith = 5
+context.strokeStyle = "#000000"
+
+context.stroke()
+```
+
+### fill 着色
+
+```js
+context.fillStyle = "#000000"
+context.fill()
+```
+
+### 绘制弧线
+
+centerx centery radius 圆心坐标 x、y，半径
+
+startingAngle, endingAngle 起始角度、结束角度
+
+anticlockwise 顺时针还是逆时针
+
+```js
+context.arc(
+  centerx, centery, radius,
+  startingAngle, endingAngle,
+  anticlockwise = false
+)
+```
