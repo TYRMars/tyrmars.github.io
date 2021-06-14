@@ -44,7 +44,6 @@ canvas.height = 768;
 const context = canvas.getContext("2d");
 ```
 
-
 ### 绘制直线
 
 moveTo与lineTo是状态设置，stroke是最终来画
@@ -82,4 +81,15 @@ context.arc(
   startingAngle, endingAngle,
   anticlockwise = false
 )
+```
+
+### 封闭路径
+
+beginPath 开始路径，重新规划路径
+
+closePath 结束路径，结束当前路径
+
+```js
+context.beginPath()
+context.closePath()
 ```
