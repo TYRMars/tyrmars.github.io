@@ -93,3 +93,28 @@ closePath 结束路径，结束当前路径
 context.beginPath()
 context.closePath()
 ```
+
+### canvas 绘图
+
+Canvas 2D API 中的 CanvasRenderingContext2D.drawImage() 方法提供了多种方式在Canvas上绘制图像。
+
+```js
+ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+```
+
+image 是我们所需要绘制到canvas 图像的文件。HTMLImageElement、HTMLCanvasElement、SVGImageElement 这三个是我们平时所使用最多的
+
+sx, sy, sWidth, sHeight 是原图片绘制中进行裁剪使用
+
+dx, dy, dWidth, dHeight 是控制图片在canvas
+
+image 绘制方式一般是等待image onload再去绘制
+
+```js
+const img = new Image()
+img.src = "https://mdn.mozillademos.org/files/225/Canvas_drawimage.jpg"
+img.onload = () => {
+  // 执行绘制
+  ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+}
+```
