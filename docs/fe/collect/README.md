@@ -1,10 +1,10 @@
 ---
-title: 文章收藏
+title: 知识收藏
 sidebar: auto
 ---
 
 ::: tip
-以下为收藏文章，方便自己回看学习
+以下为收藏文章、视频，方便自己回看学习
 :::
 
 ## Canvas
@@ -40,3 +40,7 @@ sidebar: auto
 ## 前端字体
 
 [记一次 web 字体优化](https://zhuanlan.zhihu.com/p/272783891)
+
+## 图形学
+
+[B站Video - GAMES101-现代计算机图形学入门-闫令琪](https://www.bilibili.com/video/BV1X7411F744)
