@@ -7,9 +7,11 @@ sidebar: auto
 
 主要是为了类型静态检查
 
-## 泛型实例
+### 泛型实例
 
 类型推断
+
+#### 函数：参数类型会流入函数体内
 
 ```ts
 function echo<T>(arg: T): T {
@@ -38,7 +40,9 @@ withAPI<{ age: number }>('getAge').then(resp => {
 })
 ```
 
-先来看一下React FunctionComponent 源码
+#### interface 与 泛型
+
+先来看一下React FunctionComponent 源码，定义了一个复合类型
 
 ```ts
 type FC<P={}> = FunctionComponent<P>; // P 泛型默认值为{}
@@ -52,4 +56,25 @@ interface FunctionComponent<P = {}> {
 }
 
 type PropsWithChildren<P> = P & { children?: ReactNode }; // 与的关系
+```
+
+写一个函数组件
+
+```tsx
+import React, { FunctionComponent } from 'react';
+
+// Test.propTypes
+
+interface TestProps {
+  title: string;
+}
+
+const Test: FunctionComponent<TestProps> = (props) => {
+  props.
+  return (
+    <>
+      <h1>{props.title}</h1>
+    </>
+  )
+}
 ```
