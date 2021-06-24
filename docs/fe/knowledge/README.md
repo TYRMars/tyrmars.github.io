@@ -2,9 +2,6 @@
 title: 知识列表
 sidebar: auto
 ---
-## React 相关
-
-* 组件学习 [react-component](http://react-component.github.io/badgeboard/)
 
 ## iFrame
 
@@ -29,92 +26,56 @@ iFrame 知识总结
 在开发前端项目中组件库组件库是常见的，如果我们使用的是multirepo开发策略每个组件都是一个git项目，组件库主项目也是一个git项目，一些工具库也是git项目。现在跨越了多个代码仓库的，这样如果组件库的主项目要使用的新开发的组件，就必须要组件发版，组件更改变得的麻烦。这时就可以使用monorepo，在一个git项目中建立多个package。但在使用开发中，多个package的node_moudle的包版本管理又是件很头疼的事情。
 lerna就是针对以上问题，在使用 git 和 npm 管理多软件包代码仓库的工作流程进行优化的工具。
 
-## plop 使用
+## plop
 
-Plop是一个小工具，它可以节省您的时间，并帮助您的团队构建具有一致性的新文件。
+[What Is Plop – File Generator Tool System](https://apiumhub.com/tech-blog-barcelona/plop-file-generator-tool/)
 
-## canvas 学习
+plop是一个小工具，它可以节省您的时间，并帮助您的团队构建具有一致性的新文件。
 
-```js
-const canvas = document.getElementById("canvas");
+使用`Handlebars.js`作为模板
 
-canvas.width = 1024;
-canvas.height = 768;
+基于`Inquirer.js`构建
 
-const context = canvas.getContext("2d");
+```shell
+npm i -g plop
+
+npm i --save-dev plop
 ```
 
-### 绘制直线
-
-moveTo与lineTo是状态设置，stroke是最终来画
-
-* moveTo 是起始点
-* lineTo 是线段位置
+配置文件为`plopfile.ts` 或者 `plopfile.js`
 
 ```js
-context.moveTo(100,100)
-context.lineTo(700,700)
-context.lineWith = 5
-context.strokeStyle = "#000000"
+module.exports = function (plop) {
+ plop.setGenerator('controller', {
+   description: 'application controller',
 
-context.stroke()
+   // inquirer prompts
+   prompts: [{
+     type: 'input',
+     name: 'name',
+     message: 'Controller name?'
+   }],
+
+   // actions to perform
+   actions: [{
+     type: 'add',
+     path: 'src/controllers/{{dashCase name}}.js',
+     templateFile: 'templates/controller.hbs',
+   }]
+ });
+};
 ```
 
-### fill 着色
+在package.json中添加
 
-```js
-context.fillStyle = "#000000"
-context.fill()
-```
-
-### 绘制弧线
-
-centerx centery radius 圆心坐标 x、y，半径
-
-startingAngle, endingAngle 起始角度、结束角度
-
-anticlockwise 顺时针还是逆时针
-
-```js
-context.arc(
-  centerx, centery, radius,
-  startingAngle, endingAngle,
-  anticlockwise = false
-)
-```
-
-### 封闭路径
-
-beginPath 开始路径，重新规划路径
-
-closePath 结束路径，结束当前路径
-
-```js
-context.beginPath()
-context.closePath()
-```
-
-### canvas 绘图
-
-Canvas 2D API 中的 CanvasRenderingContext2D.drawImage() 方法提供了多种方式在Canvas上绘制图像。
-
-```js
-ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-```
-
-image 是我们所需要绘制到canvas 图像的文件。HTMLImageElement、HTMLCanvasElement、SVGImageElement 这三个是我们平时所使用最多的
-
-sx, sy, sWidth, sHeight 是原图片绘制中进行裁剪使用
-
-dx, dy, dWidth, dHeight 是控制图片在canvas
-
-image 绘制方式一般是等待image onload再去绘制
-
-```js
-const img = new Image()
-img.src = "https://mdn.mozillademos.org/files/225/Canvas_drawimage.jpg"
-img.onload = () => {
-  // 执行绘制
-  ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+```json
+// package.json
+{
+    ...,
+    "scripts": {
+        "plop": "plop"
+    },
+    ...
 }
+
 ```

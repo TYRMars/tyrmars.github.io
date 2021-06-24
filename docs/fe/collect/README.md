@@ -7,25 +7,29 @@ sidebar: auto
 以下为收藏文章、视频，方便自己回看学习
 :::
 
-## Canvas
+## 设计模式
 
-[跨平台Web Canvas渲染引擎架构的设计与思考(内含实现方案)](https://mp.weixin.qq.com/s/-_4KZx54DblCylzh-kjJtw)
+[Functor, Applicative, 以及 Monad 的图片阐释](http://jiyinyiyong.github.io/monads-in-pictures/)
 
 ## React
 
+[react-component](http://react-component.github.io/badgeboard/)
+
 [React组件库搭建总结](https://mp.weixin.qq.com/s/AoPFdlpU_gONjXehNLGQTw)
+
+### Ref
 
 [React Refs转发](https://zh-hans.reactjs.org/docs/forwarding-refs.html)
 
-## webpack
+[当 ref 指向 DOM 元素时，将 ref.current 用作 useEffect 的依赖项是否安全？](https://stackoverflow.com/questions/60476155/is-it-safe-to-use-ref-current-as-useeffects-dependency-when-ref-points-to-a-dom)
+
+[Ref objects inside useEffect Hooks](https://medium.com/@teh_builder/ref-objects-inside-useeffect-hooks-eb7c15198780)
+
+## 前端工程化
 
 [手写一个webpack，看看AST怎么用](https://segmentfault.com/a/1190000039231950)
 
 [《module Federation原理学习》](https://github.com/efoxTeam/emp/wiki/%E3%80%8Amodule-Federation%E5%8E%9F%E7%90%86%E5%AD%A6%E4%B9%A0%E3%80%8B)
-
-## Chrome
-
-[从 Chrome 源码 video 实现到 Web H265 Player](https://mp.weixin.qq.com/s/RDpp2Opjh3LAxYczeHac5g)
 
 ## 前端性能
 
@@ -41,6 +45,16 @@ sidebar: auto
 
 [记一次 web 字体优化](https://zhuanlan.zhihu.com/p/272783891)
 
+## 浏览器
+
+[V8引擎知识](https://mp.weixin.qq.com/s/jf7-RqDNkPMDw-JyCHrWSQ)
+
+[从 Chrome 源码 video 实现到 Web H265 Player](https://mp.weixin.qq.com/s/RDpp2Opjh3LAxYczeHac5g)
+
 ## 图形学
 
 [B站Video - GAMES101-现代计算机图形学入门-闫令琪](https://www.bilibili.com/video/BV1X7411F744)
+
+### Canvas
+
+[跨平台Web Canvas渲染引擎架构的设计与思考(内含实现方案)](https://mp.weixin.qq.com/s/-_4KZx54DblCylzh-kjJtw)
