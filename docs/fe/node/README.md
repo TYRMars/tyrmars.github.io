@@ -171,3 +171,11 @@ console.log(ret.toString())
 在执行execFile时，安全性高于exec。例如：在执行rf -rm 这种命令，execSync可以直接执行，但是execFile执行时，在传入参数的同时，会检测传入实参执行的安全性，如果存在安全性问题，会抛出异常。除了execFile外，spawn和fork也都不能直接执行shell，因此安全性较高。
 
 :::
+
+## 事件
+
+[Node.js 事件循环，定时器和 process.nextTick()](https://nodejs.org/zh-cn/docs/guides/event-loop-timers-and-nexttick/)
+
+## Stream 概念
+
+[Node.js 中的一股清流：理解 Stream（流）的基本概念](https://juejin.cn/post/6844904014975500301)
