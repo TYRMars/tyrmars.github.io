@@ -33,7 +33,11 @@ sidebar: auto
 
 ## 前端性能
 
+[前端性能优化](https://alienzhou.github.io/fe-performance-journey/)
+
 [用 Service Worker 实现前端性能优化](https://mp.weixin.qq.com/s/re7W1YFXkd-JHREo8J6s2A)
+
+[新一代性能指标 Web Vitals](https://mp.weixin.qq.com/s/lggoRiHZysgI_cyI1dABbg)
 
 ## 微前端
 
