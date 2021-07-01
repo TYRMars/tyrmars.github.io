@@ -55,6 +55,10 @@ sidebar: auto
 
 [从 Chrome 源码 video 实现到 Web H265 Player](https://mp.weixin.qq.com/s/RDpp2Opjh3LAxYczeHac5g)
 
+## HTTP
+
+[HTTP2讲解](https://ye11ow.gitbooks.io/http2-explained/content/)
+
 ## 图形学
 
 [B站Video - GAMES101-现代计算机图形学入门-闫令琪](https://www.bilibili.com/video/BV1X7411F744)

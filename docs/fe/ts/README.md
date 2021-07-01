@@ -3,6 +3,10 @@ title: TypeScript
 sidebar: auto
 ---
 
+学习资料：
+
+[如何更容易上手 TypeScript 类型编程？](https://mp.weixin.qq.com/s/ZAryY95hk0izpb0yQ7Jb5Q)
+
 ## interface接口、泛型、类 初步学习
 
 主要是为了类型静态检查
