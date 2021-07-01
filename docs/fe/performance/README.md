@@ -7,6 +7,8 @@ sidebar: auto
 
 ## 代码优化
 
+[Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
+
 * node 查看性能
 
 ```js
@@ -134,6 +136,8 @@ export default () => {
 * 以相同顺序初始化对象成员，避免隐藏类的调整
 * 实例化后避免添加新的属性
 * 尽量使用Array代替array-like对象
+* 避免读取超过数组的长度
+* 避免元素类型转换
 
 #### 以相同顺序初始化对象成员，避免隐藏类的调整
 
@@ -164,8 +168,58 @@ const car2 = { seats: 2 }; // HC2
 car2.color = 'blue'; // HC3
 ```
 
+#### 实例化后避免添加新的属性
+
 ```js
 /* 2 */
 const car1 = { color: 'red' }; // In-object 属性
 car1.seats = 4; // Noramal/Fast 属性， 存储在property store中，需要通过描述数组扫描间接查找
 ```
+
+#### 尽量使用Array代替array-like对象
+
+```js
+Array.prototype.forEach.call(arrObj, (value, index) => { //不如真是数组上效率高
+  console.log(`${index}:${value}`)
+})
+
+const arr = Array.prototype.slice.call(arrObj, 0); // 转换的代价比影响优化小
+arr.forEach((value, index) => {
+  console.log(`${index}:${value}`)
+})
+```
+
+#### 避免读取超过数组的长度
+
+```js
+function foo(array) {
+  for(let i = 0; i <= array.length; i++) { // 越界比较
+    if(array[i] > 1000) { // 1、造成undefined跟数字比较 2、沿原型链的查找
+      console.log(array[i]) // 业务上是无效、出错
+    }
+  }
+}
+```
+
+#### 避免元素类型转换
+
+```js
+const arr = [1,2,3]; // PACKED_SMI_ELEMENTS  packed 没有undefined  smailInt
+arr.push(4.4); // PACKED_DOUBLE_ELEMENTS
+```
+
+![避免元素类型转换](./20210702-010336.png)
+
+### HTML优化
+
+[HTML Best Practices](https://github.com/hail2u/html-best-practices)
+
+[HTML Living Standard](https://whatwg-cn.github.io/html/)
+
+* 减小iframe使用
+* 压缩空白符（webpack打包去除）
+* 避免深层次的嵌套
+* 避免table布局
+* 删除注释（webpack打包去除）
+* CSS&JavaScript 尽量外链
+* 删除元素默认属性
