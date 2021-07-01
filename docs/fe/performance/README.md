@@ -131,15 +131,21 @@ export default () => {
 
 ### 对象优化
 
-:::tip
-[V8中的隐藏类（Hidden Classes）和内联缓存（Inline Caching）](https://segmentfault.com/a/1190000039247203)
-:::
-
 * 以相同顺序初始化对象成员，避免隐藏类的调整
 * 实例化后避免添加新的属性
 * 尽量使用Array代替array-like对象
 
+#### 以相同顺序初始化对象成员，避免隐藏类的调整
+
+:::tip
+[V8中的隐藏类（Hidden Classes）和内联缓存（Inline Caching）](https://segmentfault.com/a/1190000039247203)
+
+[V8 中的 Fast 属性](https://zhuanlan.zhihu.com/p/29321540)
+:::
+
 ```js
+/* 1 */ 
+// ✔
 class RectArea { // HC0
   constructor(l,w) {
     this.l = l; // HC1
@@ -149,4 +155,17 @@ class RectArea { // HC0
 
 const rect1 = new RectArea(3,4)
 const rect2 = new RectArea(5,6)
+
+// ❌
+const car1 = { color: 'red' }; // HC0
+car1.seats = 4; // HC1
+
+const car2 = { seats: 2 }; // HC2
+car2.color = 'blue'; // HC3
+```
+
+```js
+/* 2 */
+const car1 = { color: 'red' }; // In-object 属性
+car1.seats = 4; // Noramal/Fast 属性， 存储在property store中，需要通过描述数组扫描间接查找
 ```
