@@ -3,7 +3,11 @@ title: Web性能相关
 sidebar: auto
 ---
 
-## node 查看性能
+[V8引擎](https://v8.dev/#prop_access)
+
+## 代码优化
+
+* node 查看性能
 
 ```js
 const { performance, PerformanceObserver } = require('perf_hooks');
@@ -99,7 +103,7 @@ PerformanceEntry {
 }
 ```
 
-## 函数优化
+### 函数优化
 
 * lazy parsing 懒解析 vs eager parsing 解饿解析
 * 为了优化加载速度，浏览器对函数一般采取lazy parsing 懒解析方式（调用时才会解析）。
@@ -125,8 +129,24 @@ export default () => {
 }
 ```
 
-## 对象优化
+### 对象优化
+
+:::tip
+[V8中的隐藏类（Hidden Classes）和内联缓存（Inline Caching）](https://segmentfault.com/a/1190000039247203)
+:::
 
 * 以相同顺序初始化对象成员，避免隐藏类的调整
 * 实例化后避免添加新的属性
 * 尽量使用Array代替array-like对象
+
+```js
+class RectArea { // HC0
+  constructor(l,w) {
+    this.l = l; // HC1
+    this.w = w; // HC2
+  }
+}
+
+const rect1 = new RectArea(3,4)
+const rect2 = new RectArea(5,6)
+```
