@@ -1,12 +1,12 @@
 module.exports = {
   title: 'My Space',
   description: 'stay hungry stay foolish',
-  sidebar: 'auto',
   markdown: {
     lineNumbers: true
   },
   plugins: ['@vuepress/back-to-top'],
   themeConfig: {
+    sidebar: 'auto',
     nav: [
       { text: '主页', link: '/' },
       { text: '文章收藏', link: '/fe/collect/' },
@@ -17,7 +17,7 @@ module.exports = {
           { text: 'TypeScript', link: '/fe/ts/' },
           { text: 'Node.js', link: '/fe/node/' },
           { text: 'CSS', link: '/fe/css/' },
-          { text: '前端安全', link: '/fe/safe/' },
+          { text: '前端安全', link: '/fe/safe/' }, 
           { text: '前端工具', link: '/fe/tool/' },
           { text: '前端性能优化', link: '/fe/performance/' },
           { text: '图形学', link: '/fe/draw/'},
