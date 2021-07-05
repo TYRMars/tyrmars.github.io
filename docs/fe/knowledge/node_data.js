@@ -52,3 +52,21 @@ function sort (begin, end) {
     sort(part.next, end)
   }
 }
+
+function isCircle (head) {
+  let slow = head
+  let fast = head.next
+
+  while(1) {
+    // 尾巴为 undefined
+    if (!fast || fast.next) {
+     
+      return false
+    } else if (fast === slow || fast.next === slow) {
+      return true
+    } else {
+      slow = slow.next
+      fast = fast.next.next
+    }
+  }
+}
