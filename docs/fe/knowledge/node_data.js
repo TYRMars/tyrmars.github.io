@@ -70,3 +70,52 @@ function isCircle (head) {
     }
   }
 }
+
+// https://leetcode-cn.com/problems/add-two-numbers/
+
+function ListNode(val, next) {
+  this.val = (val===undefined ? 0 : val)
+  this.next = (next===undefined ? null : next)
+}
+
+var addTwoNumbers = function(l1, l2) {
+  let p = l1.next
+  let q = l2.next
+  let num = 0;
+  let newValue = 0;
+  let initVal = l1.val + l2.val;
+
+  if(initVal >= 10) {
+      initVal = initVal - 10;
+      newValue = 1
+  }
+
+  let head = new ListNode(initVal, undefined);
+  let node = head;
+
+  while(p || q || newValue > 0) {
+      if(p) {
+          num = num + p.val
+          p = p.next 
+      }
+      if(q) {
+          num = num + q.val
+          q = q.next
+      }
+      if(newValue > 0) {
+          num = num + newValue
+          newValue = 0
+      }
+      if(num >= 10) {
+         num = num - 10
+         newValue = 1;
+      }
+
+      node.next =  new ListNode(num, undefined)
+      node = node.next;
+
+      num = 0;
+  }
+
+  return head
+};
