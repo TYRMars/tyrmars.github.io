@@ -17,6 +17,8 @@ sidebar: auto
 
 [React组件库搭建总结](https://mp.weixin.qq.com/s/AoPFdlpU_gONjXehNLGQTw)
 
+[React Fiber 是如何实现更新过程可控的](https://www.zoo.team/article/about-react-fiber)
+
 ### Ref
 
 [React Refs转发](https://zh-hans.reactjs.org/docs/forwarding-refs.html)
@@ -53,7 +55,11 @@ sidebar: auto
 
 [V8引擎知识](https://mp.weixin.qq.com/s/jf7-RqDNkPMDw-JyCHrWSQ)
 
+[v8 执行 js 的过程](https://www.zoo.team/article/the-process-of-executing-js-in-v8)
+
 [从 Chrome 源码 video 实现到 Web H265 Player](https://mp.weixin.qq.com/s/RDpp2Opjh3LAxYczeHac5g)
+
+[现代浏览器观察者 Observer API 指南](https://juejin.cn/post/6844903976937209863)
 
 [webassembly](http://webassembly.org.cn/)
 
@@ -68,3 +74,7 @@ sidebar: auto
 ### Canvas
 
 [跨平台Web Canvas渲染引擎架构的设计与思考(内含实现方案)](https://mp.weixin.qq.com/s/-_4KZx54DblCylzh-kjJtw)
+
+## 架构
+
+[如何从流程上设计可持续维护的组件](https://mp.weixin.qq.com/s/ZMvVw47BU1sLBPs4N18Jcw)
