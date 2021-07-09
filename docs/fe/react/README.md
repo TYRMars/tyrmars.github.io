@@ -40,6 +40,19 @@ Stack reconciler => Fiber reconciler
 [v17.0.2](https://github.com/facebook/react/releases/tag/v17.0.2) 在React项目主目录下有 [packages/react/src/ReactHooks.js](https://github.com/facebook/react/blob/main/packages/react/src/ReactHooks.js)
 :::
 
+React源码中调度优先级使用lane取代expirationTime
+
+[lane实现](https://github.com/facebook/react/pull/18796)
+
+很明显的缺陷，他无法处理时间交割，基于时间大小的比对，只能描述一段时间，从哪儿到哪，但是当一个页面有多个更新任务（甚至多个调度器），这两段时间有有所重合，此时就很难用单纯数字去描述了
+
+lane 的本质是把数字进行位运算，不同的数字有不同的位信息，位包含多位，可以把数字当成状态队列用.
+
+```js
+export const NoLanes: Lanes = /*                        */ 0b0000000000000000000000000000000;
+export const NoLane: Lane = /*                          */ 0b0000000000000000000000000000000;
+```
+
 ```js
 export function useState<S>(
   initialState: (() => S) | S,
@@ -109,419 +122,7 @@ Hooks只有FunctionalComponent被更新的时候才会被调用，所以我们�
 * ReactFiberBeginWork.new.js
 
 ```js
-function beginWork(
-  current: Fiber | null,
-  workInProgress: Fiber,
-  renderLanes: Lanes,
-): Fiber | null {
-  const updateLanes = workInProgress.lanes;
-
-  if (__DEV__) {
-    if (workInProgress._debugNeedsRemount && current !== null) {
-      // This will restart the begin phase with a new fiber.
-      return remountFiber(
-        current,
-        workInProgress,
-        createFiberFromTypeAndProps(
-          workInProgress.type,
-          workInProgress.key,
-          workInProgress.pendingProps,
-          workInProgress._debugOwner || null,
-          workInProgress.mode,
-          workInProgress.lanes,
-        ),
-      );
-    }
-  }
-
-  if (current !== null) {
-    const oldProps = current.memoizedProps;
-    const newProps = workInProgress.pendingProps;
-
-    if (
-      oldProps !== newProps ||
-      hasLegacyContextChanged() ||
-      // Force a re-render if the implementation changed due to hot reload:
-      (__DEV__ ? workInProgress.type !== current.type : false)
-    ) {
-      // If props or context changed, mark the fiber as having performed work.
-      // This may be unset if the props are determined to be equal later (memo).
-      didReceiveUpdate = true;
-    } else if (!includesSomeLane(renderLanes, updateLanes)) {
-      didReceiveUpdate = false;
-      // This fiber does not have any pending work. Bailout without entering
-      // the begin phase. There's still some bookkeeping we that needs to be done
-      // in this optimized path, mostly pushing stuff onto the stack.
-      switch (workInProgress.tag) {
-        case HostRoot:
-          pushHostRootContext(workInProgress);
-          resetHydrationState();
-          break;
-        case HostComponent:
-          pushHostContext(workInProgress);
-          break;
-        case ClassComponent: {
-          const Component = workInProgress.type;
-          if (isLegacyContextProvider(Component)) {
-            pushLegacyContextProvider(workInProgress);
-          }
-          break;
-        }
-        case HostPortal:
-          pushHostContainer(
-            workInProgress,
-            workInProgress.stateNode.containerInfo,
-          );
-          break;
-        case ContextProvider: {
-          const newValue = workInProgress.memoizedProps.value;
-          pushProvider(workInProgress, newValue);
-          break;
-        }
-        case Profiler:
-          if (enableProfilerTimer) {
-            // Profiler should only call onRender when one of its descendants actually rendered.
-            const hasChildWork = includesSomeLane(
-              renderLanes,
-              workInProgress.childLanes,
-            );
-            if (hasChildWork) {
-              workInProgress.flags |= Update;
-            }
-
-            // Reset effect durations for the next eventual effect phase.
-            // These are reset during render to allow the DevTools commit hook a chance to read them,
-            const stateNode = workInProgress.stateNode;
-            stateNode.effectDuration = 0;
-            stateNode.passiveEffectDuration = 0;
-          }
-          break;
-        case SuspenseComponent: {
-          const state: SuspenseState | null = workInProgress.memoizedState;
-          if (state !== null) {
-            if (enableSuspenseServerRenderer) {
-              if (state.dehydrated !== null) {
-                pushSuspenseContext(
-                  workInProgress,
-                  setDefaultShallowSuspenseContext(suspenseStackCursor.current),
-                );
-                // We know that this component will suspend again because if it has
-                // been unsuspended it has committed as a resolved Suspense component.
-                // If it needs to be retried, it should have work scheduled on it.
-                workInProgress.flags |= DidCapture;
-                // We should never render the children of a dehydrated boundary until we
-                // upgrade it. We return null instead of bailoutOnAlreadyFinishedWork.
-                return null;
-              }
-            }
-
-            // If this boundary is currently timed out, we need to decide
-            // whether to retry the primary children, or to skip over it and
-            // go straight to the fallback. Check the priority of the primary
-            // child fragment.
-            const primaryChildFragment: Fiber = (workInProgress.child: any);
-            const primaryChildLanes = primaryChildFragment.childLanes;
-            if (includesSomeLane(renderLanes, primaryChildLanes)) {
-              // The primary children have pending work. Use the normal path
-              // to attempt to render the primary children again.
-              return updateSuspenseComponent(
-                current,
-                workInProgress,
-                renderLanes,
-              );
-            } else {
-              // The primary child fragment does not have pending work marked
-              // on it
-              pushSuspenseContext(
-                workInProgress,
-                setDefaultShallowSuspenseContext(suspenseStackCursor.current),
-              );
-              // The primary children do not have pending work with sufficient
-              // priority. Bailout.
-              const child = bailoutOnAlreadyFinishedWork(
-                current,
-                workInProgress,
-                renderLanes,
-              );
-              if (child !== null) {
-                // The fallback children have pending work. Skip over the
-                // primary children and work on the fallback.
-                return child.sibling;
-              } else {
-                return null;
-              }
-            }
-          } else {
-            pushSuspenseContext(
-              workInProgress,
-              setDefaultShallowSuspenseContext(suspenseStackCursor.current),
-            );
-          }
-          break;
-        }
-        case SuspenseListComponent: {
-          const didSuspendBefore = (current.flags & DidCapture) !== NoFlags;
-
-          const hasChildWork = includesSomeLane(
-            renderLanes,
-            workInProgress.childLanes,
-          );
-
-          if (didSuspendBefore) {
-            if (hasChildWork) {
-              // If something was in fallback state last time, and we have all the
-              // same children then we're still in progressive loading state.
-              // Something might get unblocked by state updates or retries in the
-              // tree which will affect the tail. So we need to use the normal
-              // path to compute the correct tail.
-              return updateSuspenseListComponent(
-                current,
-                workInProgress,
-                renderLanes,
-              );
-            }
-            // If none of the children had any work, that means that none of
-            // them got retried so they'll still be blocked in the same way
-            // as before. We can fast bail out.
-            workInProgress.flags |= DidCapture;
-          }
-
-          // If nothing suspended before and we're rendering the same children,
-          // then the tail doesn't matter. Anything new that suspends will work
-          // in the "together" mode, so we can continue from the state we had.
-          const renderState = workInProgress.memoizedState;
-          if (renderState !== null) {
-            // Reset to the "together" mode in case we've started a different
-            // update in the past but didn't complete it.
-            renderState.rendering = null;
-            renderState.tail = null;
-            renderState.lastEffect = null;
-          }
-          pushSuspenseContext(workInProgress, suspenseStackCursor.current);
-
-          if (hasChildWork) {
-            break;
-          } else {
-            // If none of the children had any work, that means that none of
-            // them got retried so they'll still be blocked in the same way
-            // as before. We can fast bail out.
-            return null;
-          }
-        }
-        case OffscreenComponent:
-        case LegacyHiddenComponent: {
-          // Need to check if the tree still needs to be deferred. This is
-          // almost identical to the logic used in the normal update path,
-          // so we'll just enter that. The only difference is we'll bail out
-          // at the next level instead of this one, because the child props
-          // have not changed. Which is fine.
-          // TODO: Probably should refactor `beginWork` to split the bailout
-          // path from the normal path. I'm tempted to do a labeled break here
-          // but I won't :)
-          workInProgress.lanes = NoLanes;
-          return updateOffscreenComponent(current, workInProgress, renderLanes);
-        }
-      }
-      return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
-    } else {
-      if ((current.flags & ForceUpdateForLegacySuspense) !== NoFlags) {
-        // This is a special case that only exists for legacy mode.
-        // See https://github.com/facebook/react/pull/19216.
-        didReceiveUpdate = true;
-      } else {
-        // An update was scheduled on this fiber, but there are no new props
-        // nor legacy context. Set this to false. If an update queue or context
-        // consumer produces a changed value, it will set this to true. Otherwise,
-        // the component will assume the children have not changed and bail out.
-        didReceiveUpdate = false;
-      }
-    }
-  } else {
-    didReceiveUpdate = false;
-  }
-
-  // Before entering the begin phase, clear pending update priority.
-  // TODO: This assumes that we're about to evaluate the component and process
-  // the update queue. However, there's an exception: SimpleMemoComponent
-  // sometimes bails out later in the begin phase. This indicates that we should
-  // move this assignment out of the common path and into each branch.
-  workInProgress.lanes = NoLanes;
-
-  switch (workInProgress.tag) {
-    case IndeterminateComponent: {
-      return mountIndeterminateComponent(
-        current,
-        workInProgress,
-        workInProgress.type,
-        renderLanes,
-      );
-    }
-    case LazyComponent: {
-      const elementType = workInProgress.elementType;
-      return mountLazyComponent(
-        current,
-        workInProgress,
-        elementType,
-        updateLanes,
-        renderLanes,
-      );
-    }
-    case FunctionComponent: {
-      const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === Component
-          ? unresolvedProps
-          : resolveDefaultProps(Component, unresolvedProps);
-      return updateFunctionComponent(
-        current,
-        workInProgress,
-        Component,
-        resolvedProps,
-        renderLanes,
-      );
-    }
-    case ClassComponent: {
-      const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === Component
-          ? unresolvedProps
-          : resolveDefaultProps(Component, unresolvedProps);
-      return updateClassComponent(
-        current,
-        workInProgress,
-        Component,
-        resolvedProps,
-        renderLanes,
-      );
-    }
-    case HostRoot:
-      return updateHostRoot(current, workInProgress, renderLanes);
-    case HostComponent:
-      return updateHostComponent(current, workInProgress, renderLanes);
-    case HostText:
-      return updateHostText(current, workInProgress);
-    case SuspenseComponent:
-      return updateSuspenseComponent(current, workInProgress, renderLanes);
-    case HostPortal:
-      return updatePortalComponent(current, workInProgress, renderLanes);
-    case ForwardRef: {
-      const type = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === type
-          ? unresolvedProps
-          : resolveDefaultProps(type, unresolvedProps);
-      return updateForwardRef(
-        current,
-        workInProgress,
-        type,
-        resolvedProps,
-        renderLanes,
-      );
-    }
-    case Fragment:
-      return updateFragment(current, workInProgress, renderLanes);
-    case Mode:
-      return updateMode(current, workInProgress, renderLanes);
-    case Profiler:
-      return updateProfiler(current, workInProgress, renderLanes);
-    case ContextProvider:
-      return updateContextProvider(current, workInProgress, renderLanes);
-    case ContextConsumer:
-      return updateContextConsumer(current, workInProgress, renderLanes);
-    case MemoComponent: {
-      const type = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      // Resolve outer props first, then resolve inner props.
-      let resolvedProps = resolveDefaultProps(type, unresolvedProps);
-      if (__DEV__) {
-        if (workInProgress.type !== workInProgress.elementType) {
-          const outerPropTypes = type.propTypes;
-          if (outerPropTypes) {
-            checkPropTypes(
-              outerPropTypes,
-              resolvedProps, // Resolved for outer only
-              'prop',
-              getComponentName(type),
-            );
-          }
-        }
-      }
-      resolvedProps = resolveDefaultProps(type.type, resolvedProps);
-      return updateMemoComponent(
-        current,
-        workInProgress,
-        type,
-        resolvedProps,
-        updateLanes,
-        renderLanes,
-      );
-    }
-    case SimpleMemoComponent: {
-      return updateSimpleMemoComponent(
-        current,
-        workInProgress,
-        workInProgress.type,
-        workInProgress.pendingProps,
-        updateLanes,
-        renderLanes,
-      );
-    }
-    case IncompleteClassComponent: {
-      const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === Component
-          ? unresolvedProps
-          : resolveDefaultProps(Component, unresolvedProps);
-      return mountIncompleteClassComponent(
-        current,
-        workInProgress,
-        Component,
-        resolvedProps,
-        renderLanes,
-      );
-    }
-    case SuspenseListComponent: {
-      return updateSuspenseListComponent(current, workInProgress, renderLanes);
-    }
-    case FundamentalComponent: {
-      if (enableFundamentalAPI) {
-        return updateFundamentalComponent(current, workInProgress, renderLanes);
-      }
-      break;
-    }
-    case ScopeComponent: {
-      if (enableScopeAPI) {
-        return updateScopeComponent(current, workInProgress, renderLanes);
-      }
-      break;
-    }
-    case Block: {
-      if (enableBlocksAPI) {
-        const block = workInProgress.type;
-        const props = workInProgress.pendingProps;
-        return updateBlock(current, workInProgress, block, props, renderLanes);
-      }
-      break;
-    }
-    case OffscreenComponent: {
-      return updateOffscreenComponent(current, workInProgress, renderLanes);
-    }
-    case LegacyHiddenComponent: {
-      return updateLegacyHiddenComponent(current, workInProgress, renderLanes);
-    }
-  }
-  invariant(
-    false,
-    'Unknown unit of work tag (%s). This error is likely caused by a bug in ' +
-      'React. Please file an issue.',
-    workInProgress.tag,
-  );
-}
-
+// packages\react-reconciler\src\ReactFiberBeginWork.new.js
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -604,11 +205,32 @@ function updateFunctionComponent(
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
+
+export function bailoutHooks(
+  current: Fiber,
+  workInProgress: Fiber,
+  lanes: Lanes,
+) {
+  workInProgress.updateQueue = current.updateQueue;
+  if (__DEV__ && enableDoubleInvokingEffects) {
+    workInProgress.flags &= ~(
+      MountPassiveDevEffect |
+      PassiveEffect |
+      MountLayoutDevEffect |
+      UpdateEffect
+    );
+  } else {
+    workInProgress.flags &= ~(PassiveEffect | UpdateEffect);
+  }
+  current.lanes = removeLanes(current.lanes, lanes);
+}
+
 ```
 
-* ReactFiberHooks.new.js
+* packages\react-reconciler\src\ReactFiberHooks.new.js
 
 ```js
+// packages\react-reconciler\src\ReactFiberHooks.new.js
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -617,6 +239,7 @@ export function renderWithHooks<Props, SecondArg>(
   secondArg: SecondArg,
   nextRenderLanes: Lanes,
 ): any {
+  // 优先级
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
 
@@ -662,18 +285,26 @@ export function renderWithHooks<Props, SecondArg>(
       ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
     }
   } else {
+    // 用来存放 useState、useEffect 等 hook 函数的对象
+    // 对于第一个渲染走的是 HooksDispatcherOnMount
+    // 之后走的是 HooksDispatcherOnUpdate
     ReactCurrentDispatcher.current =
       current === null || current.memoizedState === null
         ? HooksDispatcherOnMount
         : HooksDispatcherOnUpdate;
   }
 
+  // 执行我们写的 function，执行完毕后，返回 children
+  // 第二个参数就是 context
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update
+  // 当有更新要渲染时
   if (didScheduleRenderPhaseUpdateDuringThisPass) {
     // Keep rendering in a loop for as long as render phase updates continue to
     // be scheduled. Use a counter to prevent infinite loops.
+    // 只要渲染阶段更新继续，就保持循环渲染
+    // 使用计数器防止这里无限循环
     let numberOfReRenders: number = 0;
     do {
       didScheduleRenderPhaseUpdateDuringThisPass = false;
@@ -705,6 +336,7 @@ export function renderWithHooks<Props, SecondArg>(
         ? HooksDispatcherOnRerenderInDEV
         : HooksDispatcherOnRerender;
 
+      // 重新渲染
       children = Component(props, secondArg);
     } while (didScheduleRenderPhaseUpdateDuringThisPass);
   }
@@ -722,6 +354,7 @@ export function renderWithHooks<Props, SecondArg>(
   const didRenderTooFewHooks =
     currentHook !== null && currentHook.next !== null;
 
+  // 重置全局变量
   renderLanes = NoLanes;
   currentlyRenderingFiber = (null: any);
 
@@ -744,26 +377,261 @@ export function renderWithHooks<Props, SecondArg>(
 
   return children;
 }
+```
 
-export function bailoutHooks(
-  current: Fiber,
-  workInProgress: Fiber,
-  lanes: Lanes,
+Hooks Dispatcher 存放地
+
+```js
+// packages\react-reconciler\src\ReactFiberHooks.new.js
+// fiber 就是当前 functionComponent 的 Fiber 对象
+// queue 是首次渲染的时候 new 的一个对象，用于存放后续的 dispatchAction 的 action
+// action 就是我们写的 setCount(count + 1)
+function dispatchAction<S, A>(
+  fiber: Fiber,
+  queue: UpdateQueue<S, A>,
+  action: A,
 ) {
-  workInProgress.updateQueue = current.updateQueue;
-  if (__DEV__ && enableDoubleInvokingEffects) {
-    workInProgress.flags &= ~(
-      MountPassiveDevEffect |
-      PassiveEffect |
-      MountLayoutDevEffect |
-      UpdateEffect
-    );
-  } else {
-    workInProgress.flags &= ~(PassiveEffect | UpdateEffect);
+  if (__DEV__) {
+    if (typeof arguments[3] === 'function') {
+      console.error(
+        "State updates from the useState() and useReducer() Hooks don't support the " +
+          'second callback argument. To execute a side effect after ' +
+          'rendering, declare it in the component body with useEffect().',
+      );
+    }
   }
-  current.lanes = removeLanes(current.lanes, lanes);
+
+  // eventTime是当前触发更新的时间戳
+  const eventTime = requestEventTime();
+  // 获取Fiber的lane 优先级
+  const lane = requestUpdateLane(fiber);
+
+  const update: Update<S, A> = {
+    lane,
+    action,
+    eagerReducer: null,
+    eagerState: null,
+    next: (null: any),
+  };
+
+  // Append the update to the end of the list.
+  const pending = queue.pending;
+  if (pending === null) {
+    // This is the first update. Create a circular list.
+    update.next = update;
+  } else {
+    update.next = pending.next;
+    pending.next = update;
+  }
+  queue.pending = update;
+
+  const alternate = fiber.alternate; // old Fiber
+  if (
+    fiber === currentlyRenderingFiber ||
+    (alternate !== null && alternate === currentlyRenderingFiber)
+  ) {
+    // This is a render phase update. Stash it in a lazily-created map of
+    // queue -> linked list of updates. After this render pass, we'll restart
+    // and apply the stashed updates on top of the work-in-progress hook.
+    didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
+  } else {
+    if (
+      fiber.lanes === NoLanes &&
+      (alternate === null || alternate.lanes === NoLanes)
+    ) {
+      // The queue is currently empty, which means we can eagerly compute the
+      // next state before entering the render phase. If the new state is the
+      // same as the current state, we may be able to bail out entirely.
+      const lastRenderedReducer = queue.lastRenderedReducer;
+      if (lastRenderedReducer !== null) {
+        let prevDispatcher;
+        try {
+          const currentState: S = (queue.lastRenderedState: any);
+          const eagerState = lastRenderedReducer(currentState, action);
+          // Stash the eagerly computed state, and the reducer used to compute
+          // it, on the update object. If the reducer hasn't changed by the
+          // time we enter the render phase, then the eager state can be used
+          // without calling the reducer again.
+          update.eagerReducer = lastRenderedReducer;
+          update.eagerState = eagerState;
+          if (is(eagerState, currentState)) {
+            // Fast path. We can bail out without scheduling React to re-render.
+            // It's still possible that we'll need to rebase this update later,
+            // if the component re-renders for a different reason and by that
+            // time the reducer has changed.
+            return;
+          }
+        } catch (error) {
+          // Suppress the error. It will throw again in the render phase.
+        }
+      }
+    }
+    scheduleUpdateOnFiber(fiber, lane, eventTime);
+  }
+
+  if (enableSchedulingProfiler) {
+    markStateUpdateScheduled(fiber, lane);
+  }
 }
 
+const HooksDispatcherOnMount: Dispatcher = {
+  readContext,
+
+  useCallback: mountCallback,
+  useContext: readContext,
+  useEffect: mountEffect,
+  useImperativeHandle: mountImperativeHandle,
+  useLayoutEffect: mountLayoutEffect,
+  useMemo: mountMemo,
+  useReducer: mountReducer,
+  useRef: mountRef,
+  useState: mountState,
+  useDebugValue: mountDebugValue,
+  useDeferredValue: mountDeferredValue,
+  useTransition: mountTransition,
+  useMutableSource: mountMutableSource,
+  useOpaqueIdentifier: mountOpaqueIdentifier,
+
+  unstable_isNewReconciler: enableNewReconciler,
+};
+
+const HooksDispatcherOnUpdate: Dispatcher = {
+  readContext,
+
+  useCallback: updateCallback,
+  useContext: readContext,
+  useEffect: updateEffect,
+  useImperativeHandle: updateImperativeHandle,
+  useLayoutEffect: updateLayoutEffect,
+  useMemo: updateMemo,
+  useReducer: updateReducer,
+  useRef: updateRef,
+  useState: updateState,
+  useDebugValue: updateDebugValue,
+  useDeferredValue: updateDeferredValue,
+  useTransition: updateTransition,
+  useMutableSource: updateMutableSource,
+  useOpaqueIdentifier: updateOpaqueIdentifier,
+
+  unstable_isNewReconciler: enableNewReconciler,
+};
+
+```
+
+```js
+// packages\react-reconciler\src\ReactFiberHooks.new.js
+function mountState<S>(
+  initialState: (() => S) | S,
+): [S, Dispatch<BasicStateAction<S>>] {
+  const hook = mountWorkInProgressHook();
+  if (typeof initialState === 'function') {
+    // $FlowFixMe: Flow doesn't like mixed types
+    initialState = initialState();
+  }
+  hook.memoizedState = hook.baseState = initialState;
+  const queue = (hook.queue = {
+    pending: null,
+    dispatch: null,
+    lastRenderedReducer: basicStateReducer,
+    lastRenderedState: (initialState: any),
+  });
+  const dispatch: Dispatch<
+    BasicStateAction<S>,
+  > = (queue.dispatch = (dispatchAction.bind(
+    null,
+    currentlyRenderingFiber,
+    queue,
+  ): any));
+  return [hook.memoizedState, dispatch];
+}
+```
+
+```js
+// packages\react-reconciler\src\ReactFiberHooks.new.js
+function mountWorkInProgressHook(): Hook {
+  const hook: Hook = {
+    memoizedState: null,
+
+    baseState: null,
+    baseQueue: null,
+    queue: null,
+
+    next: null,
+  };
+
+  if (workInProgressHook === null) {
+    // This is the first hook in the list
+    currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
+  } else {
+    // Append to the end of the list
+    workInProgressHook = workInProgressHook.next = hook;
+  }
+  return workInProgressHook;
+}
+```
+
+```js
+// packages\react-reconciler\src\ReactFiberHooks.new.js
+function updateWorkInProgressHook(): Hook {
+  // This function is used both for updates and for re-renders triggered by a
+  // render phase update. It assumes there is either a current hook we can
+  // clone, or a work-in-progress hook from a previous render pass that we can
+  // use as a base. When we reach the end of the base list, we must switch to
+  // the dispatcher used for mounts.
+  let nextCurrentHook: null | Hook;
+  if (currentHook === null) {
+    const current = currentlyRenderingFiber.alternate;
+    if (current !== null) {
+      nextCurrentHook = current.memoizedState;
+    } else {
+      nextCurrentHook = null;
+    }
+  } else {
+    nextCurrentHook = currentHook.next;
+  }
+
+  let nextWorkInProgressHook: null | Hook;
+  if (workInProgressHook === null) {
+    nextWorkInProgressHook = currentlyRenderingFiber.memoizedState;
+  } else {
+    nextWorkInProgressHook = workInProgressHook.next;
+  }
+
+  if (nextWorkInProgressHook !== null) {
+    // There's already a work-in-progress. Reuse it.
+    workInProgressHook = nextWorkInProgressHook;
+    nextWorkInProgressHook = workInProgressHook.next;
+
+    currentHook = nextCurrentHook;
+  } else {
+    // Clone from the current hook.
+
+    invariant(
+      nextCurrentHook !== null,
+      'Rendered more hooks than during the previous render.',
+    );
+    currentHook = nextCurrentHook;
+
+    const newHook: Hook = {
+      memoizedState: currentHook.memoizedState,
+
+      baseState: currentHook.baseState,
+      baseQueue: currentHook.baseQueue,
+      queue: currentHook.queue,
+
+      next: null,
+    };
+
+    if (workInProgressHook === null) {
+      // This is the first hook in the list.
+      currentlyRenderingFiber.memoizedState = workInProgressHook = newHook;
+    } else {
+      // Append to the end of the list.
+      workInProgressHook = workInProgressHook.next = newHook;
+    }
+  }
+  return workInProgressHook;
+}
 ```
 
 ## useState实现原理
@@ -776,97 +644,159 @@ function basicStateReducer<S>(state: S, action: BasicStateAction<S>): S {
   return typeof action === 'function' ? action(state) : action;
 }
 
-export function useState<S>(
+
+function updateState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {
-  if (__DEV__) {
-    currentHookNameInDev = 'useState';
-  }
-  return useReducer(
-    basicStateReducer,
-    // useReducer has a special case to support lazy useState initializers
-    (initialState: any),
-  );
+  return updateReducer(basicStateReducer, (initialState: any));
 }
 ```
 
 * useReducer
 
 ```js
-export function useReducer<S, I, A>(
+let currentHook: Hook | null = null; // 全局变量
+
+function updateReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
   init?: I => S,
 ): [S, Dispatch<A>] {
-  if (__DEV__) {
-    if (reducer !== basicStateReducer) {
-      currentHookNameInDev = 'useReducer';
+  // 复制一个当前的 hook 对象为工作区
+  const hook = updateWorkInProgressHook();
+  const queue = hook.queue;
+  invariant(
+    queue !== null,
+    'Should have a queue. This is likely a bug in React. Please file an issue.',
+  );
+
+  queue.lastRenderedReducer = reducer;
+
+  const current: Hook = (currentHook: any);
+
+  // The last rebase update that is NOT part of the base state.
+  let baseQueue = current.baseQueue;
+
+  // The last pending update that hasn't been processed yet.
+  const pendingQueue = queue.pending;
+  if (pendingQueue !== null) {
+    // We have new updates that haven't been processed yet.
+    // We'll add them to the base queue.
+    if (baseQueue !== null) {
+      // Merge the pending queue and the base queue.
+      const baseFirst = baseQueue.next;
+      const pendingFirst = pendingQueue.next;
+      baseQueue.next = pendingFirst;
+      pendingQueue.next = baseFirst;
     }
-  }
-  currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
-  workInProgressHook = createWorkInProgressHook();
-  if (isReRender) {
-    // This is a re-render. Apply the new render phase updates to the previous
-    // current hook.
-    const queue: UpdateQueue<A> = (workInProgressHook.queue: any);
-    const dispatch: Dispatch<A> = (queue.dispatch: any);
-    if (renderPhaseUpdates !== null) {
-      // Render phase updates are stored in a map of queue -> linked list
-      const firstRenderPhaseUpdate = renderPhaseUpdates.get(queue);
-      if (firstRenderPhaseUpdate !== undefined) {
-        renderPhaseUpdates.delete(queue);
-        let newState = workInProgressHook.memoizedState;
-        let update = firstRenderPhaseUpdate;
-        do {
-          // Process this render phase update. We don't have to check the
-          // priority because it will always be the same as the current
-          // render's.
-          const action = update.action;
-          if (__DEV__) {
-            isInHookUserCodeInDev = true;
-          }
-          newState = reducer(newState, action);
-          if (__DEV__) {
-            isInHookUserCodeInDev = false;
-          }
-          update = update.next;
-        } while (update !== null);
-
-        workInProgressHook.memoizedState = newState;
-
-        return [newState, dispatch];
+    if (__DEV__) {
+      if (current.baseQueue !== baseQueue) {
+        // Internal invariant that should never happen, but feasibly could in
+        // the future if we implement resuming, or some form of that.
+        console.error(
+          'Internal error: Expected work-in-progress queue to be a clone. ' +
+            'This is a bug in React.',
+        );
       }
     }
-    return [workInProgressHook.memoizedState, dispatch];
-  } else {
-    if (__DEV__) {
-      isInHookUserCodeInDev = true;
-    }
-    let initialState;
-    if (reducer === basicStateReducer) {
-      // Special case for `useState`.
-      initialState =
-        typeof initialArg === 'function'
-          ? ((initialArg: any): () => S)()
-          : ((initialArg: any): S);
-    } else {
-      initialState =
-        init !== undefined ? init(initialArg) : ((initialArg: any): S);
-    }
-    if (__DEV__) {
-      isInHookUserCodeInDev = false;
-    }
-    workInProgressHook.memoizedState = initialState;
-    const queue: UpdateQueue<A> = (workInProgressHook.queue = {
-      last: null,
-      dispatch: null,
-    });
-    const dispatch: Dispatch<A> = (queue.dispatch = (dispatchAction.bind(
-      null,
-      currentlyRenderingComponent,
-      queue,
-    ): any));
-    return [workInProgressHook.memoizedState, dispatch];
+    current.baseQueue = baseQueue = pendingQueue;
+    queue.pending = null;
   }
+
+  if (baseQueue !== null) {
+    // We have a queue to process.
+    // 队列要处理
+    const first = baseQueue.next;
+    let newState = current.baseState;
+
+    let newBaseState = null;
+    let newBaseQueueFirst = null;
+    let newBaseQueueLast = null;
+    let update = first;
+
+    // 循环完成 update
+    do {
+      const updateLane = update.lane;
+      if (!isSubsetOfLanes(renderLanes, updateLane)) {
+        // Priority is insufficient. Skip this update. If this is the first
+        // skipped update, the previous update/state is the new base
+        // update/state.
+        const clone: Update<S, A> = {
+          lane: updateLane,
+          action: update.action,
+          eagerReducer: update.eagerReducer,
+          eagerState: update.eagerState,
+          next: (null: any),
+        };
+        if (newBaseQueueLast === null) {
+          newBaseQueueFirst = newBaseQueueLast = clone;
+          newBaseState = newState;
+        } else {
+          newBaseQueueLast = newBaseQueueLast.next = clone;
+        }
+        // Update the remaining priority in the queue.
+        // TODO: Don't need to accumulate this. Instead, we can remove
+        // renderLanes from the original lanes.
+        currentlyRenderingFiber.lanes = mergeLanes(
+          currentlyRenderingFiber.lanes,
+          updateLane,
+        );
+        markSkippedUpdateLanes(updateLane);
+      } else {
+        // This update does have sufficient priority.
+
+        if (newBaseQueueLast !== null) {
+          const clone: Update<S, A> = {
+            // This update is going to be committed so we never want uncommit
+            // it. Using NoLane works because 0 is a subset of all bitmasks, so
+            // this will never be skipped by the check above.
+            lane: NoLane,
+            action: update.action,
+            eagerReducer: update.eagerReducer,
+            eagerState: update.eagerState,
+            next: (null: any),
+          };
+          newBaseQueueLast = newBaseQueueLast.next = clone;
+        }
+
+        // Process this update.
+        if (update.eagerReducer === reducer) {
+          // If this update was processed eagerly, and its reducer matches the
+          // current reducer, we can use the eagerly computed state.
+          newState = ((update.eagerState: any): S);
+        } else {
+          const action = update.action;
+          newState = reducer(newState, action);
+        }
+      }
+      update = update.next;
+    } while (update !== null && update !== first);
+
+    if (newBaseQueueLast === null) {
+      newBaseState = newState;
+    } else {
+      newBaseQueueLast.next = (newBaseQueueFirst: any);
+    }
+
+    // Mark that the fiber performed work, but only if the new state is
+    // different from the current state.
+    if (!is(newState, hook.memoizedState)) {
+      markWorkInProgressReceivedUpdate();
+    }
+
+    hook.memoizedState = newState;
+    hook.baseState = newBaseState;
+    hook.baseQueue = newBaseQueueLast;
+
+    queue.lastRenderedState = newState;
+  }
+
+  const dispatch: Dispatch<A> = (queue.dispatch: any);
+  return [hook.memoizedState, dispatch];
 }
 ```
+
+1. FunctionComponent 不是一个可以实例化的对象，也就没有 this，没有 state，但是 React 的 Fiber 对象为此提供了可能，由于 Fiber 是一个对象，所以就将 FunctionComponent 中无法挂载的一些值和方法挂载到了 FunctionComponent 对应的 Fiber 对象上，并且起了个名字叫做 Hook。具体就是挂载到 Fiber 对象的 memoizedState 上.
+2. Fiber 中也使用了 Update 链表的形式存储更新.比如实际操作中每次点击都会产生一个 update，放入 Hook 对象的 queue 中，然后触发一次任务调度，将这些更新执行。
+3. Hooks 对外暴露的接口，其实就是用来操作 Hook 对象的，Hook 对象通过 Fiber 和 FunctionComponent 完成绑定，间接控制了 FunctionComponent 的行为。
+4. Hooks 的一个小优化：产生 update 的时候，如果当前 fiber 上无更新任务，会计算本次 update 的结果，与产生 update 之前的比较，如果没有变化，不会进行任务调度，如果有变化的话，会将结果存储起来，下次调度的时候就不用再计算了。
