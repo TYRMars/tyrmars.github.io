@@ -1,7 +1,9 @@
 ---
-title: RxJS 学习
+title: 状态管理
 sidebar: auto
 ---
+
+## Redux
 
 ## RxJS的核心概念
 

@@ -3,9 +3,60 @@ title: Web性能相关
 sidebar: auto
 ---
 
-[V8引擎](https://v8.dev/#prop_access)
+## 性能指标
+
+### lightHouse
+
+* First Contentful Paint (首次渲染)
+* Speed Index （速度指数，所有内容看到）
+* Largest Contentful （最大内容花了多久）
+* Time to Interactive （何时用户可以交互）
+* Total Blocking Time
+* Cumulatice Layout Shift
+
+#### 优化提示
+
+* Remove unused JavaScript 移除无用JavaScript
+* Eliminate render-blocking resources 阻塞JS
+
+### 性能指标PerformanceAPI
+
+* DNS 解析耗时： domainLookupEnd - domaminLookupStart
+* TCP 链接耗时: connectEnd - connectStart
+* SSL 安全连接耗时: connectEnd - secureConnectionStart
+* 网络请求耗时（TTFB）: responseStart - requestStart
+* 数据传输耗时：responseEnd - responseStart
+* DOM 解析耗时：domInteractive - responseEnd
+* 资源加载耗时：loadEnventStart - domContentLoadedEventEnd
+* First Byte时间：responseStart - domainLookupStart
+* 白屏时间：responseEnd - fetchStart
+* 首次可交互时间： domInteractive - fetchStart
+* DOM Ready 时间：domContentLoadEventEnd - fetchStart
+* 页面完全加载时间: loadEventStart - fetchStart
+* http 头部大小: transferSize - encodeBodySize
+* 重定向次数：performance.navigation.redirectCount
+* 重定向耗时：redirectEnd - redirectStart
+
+### 性能监测对象 PerformanceObserver
+
+:::tip
+[MDN-性能监测对象](https://developer.mozilla.org/zh-CN/docs/Web/API/PerformanceObserver)
+:::
+
+PerformanceObserver 用于监测性能度量事件，在浏览器的性能时间轴记录下一个新的 performance entries  的时候将会被通知 。
+
+```js
+function perfObserver(list, observer) {
+   // Process the "measure" event
+   // 处理 "measure" 事件
+}
+let observer = new PerformanceObserver(perfObserver);
+observer.observe({entryTypes: ["measure"]});
+```
 
 ## 代码优化
+
+[V8引擎](https://v8.dev/#prop_access)
 
 [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
 
@@ -223,3 +274,7 @@ arr.push(4.4); // PACKED_DOUBLE_ELEMENTS
 * 删除注释（webpack打包去除）
 * CSS&JavaScript 尽量外链
 * 删除元素默认属性
+
+## 字体优化
+
+* font-display
