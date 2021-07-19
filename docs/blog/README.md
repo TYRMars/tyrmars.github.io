@@ -69,7 +69,7 @@ block(阻塞) -> swap(交换) -> failure(失败)
 
 ### Electron 构建
 
-寻找最好的构建Electron + React方式
+寻找构建Electron + React方式
 
 [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate)
 

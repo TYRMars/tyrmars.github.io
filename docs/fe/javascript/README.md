@@ -3,6 +3,31 @@ title: JavaScipt
 sidebar: auto
 ---
 
+[JavaScript 踩坑指南](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)
+
+## 事件循环
+
+[菲利普·罗伯茨：到底什么是Event Loop呢？ | 欧洲 JSConf 2014](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
+
+```js
+// Call Stack
+
+function multiply(a, b) {
+  return a * b;
+}
+
+function square(n) {
+  return multiply(n, n);
+}
+
+function printSquare(n) {
+  var squared = square(n);
+  console.log(squared);
+}
+
+printSquare(4)
+```
+
 ## Promise 处理异步
 
 ```js

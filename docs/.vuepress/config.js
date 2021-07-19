@@ -13,6 +13,7 @@ module.exports = {
       {
         text: '前端知识',
         items: [
+          { text: 'JavaScript', link: '/fe/javascript/' },
           { text: 'CSS', link: '/fe/css/' },
           { text: 'React', link: '/fe/react/' },
           { text: 'TypeScript', link: '/fe/ts/' },
