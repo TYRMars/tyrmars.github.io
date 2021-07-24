@@ -19,6 +19,8 @@ sidebar: auto
 
 [React Fiber 是如何实现更新过程可控的](https://www.zoo.team/article/about-react-fiber)
 
+[React的新引擎—React Fiber是什么？](https://juejin.cn/post/6844903700717109261)
+
 ### Ref
 
 [React Refs转发](https://zh-hans.reactjs.org/docs/forwarding-refs.html)
@@ -57,6 +59,8 @@ sidebar: auto
 
 [v8 执行 js 的过程](https://www.zoo.team/article/the-process-of-executing-js-in-v8)
 
+[How cc Works 中文译文](https://zhuanlan.zhihu.com/p/54601110)
+
 [从 Chrome 源码 video 实现到 Web H265 Player](https://mp.weixin.qq.com/s/RDpp2Opjh3LAxYczeHac5g)
 
 [现代浏览器观察者 Observer API 指南](https://juejin.cn/post/6844903976937209863)
@@ -78,3 +82,7 @@ sidebar: auto
 ## 架构
 
 [如何从流程上设计可持续维护的组件](https://mp.weixin.qq.com/s/ZMvVw47BU1sLBPs4N18Jcw)
+
+## 编程基础
+
+[前端也要懂编译：AST 从入门到上手指南](https://mp.weixin.qq.com/s/VzufokrGUgAcmBykIAh4SQ)
