@@ -55,6 +55,61 @@ const handlerClick = () => {
 }
 ```
 
+## 自定义promise
+
+```js
+function Promise(executor){
+  this.PromiseState = 'pending';
+  this.PromiseResult = null;
+  this.callbacks = [];
+
+  const _this = this;
+
+  // resolve 函数
+  function resolve(data) {
+    // 修改对象状态
+    if(_this.PromiseState === 'pending') return
+    _this.PromiseState = 'fulfiled'
+    // 设置对象结果值
+    _this.PromiseResult = data;
+    _this.callbacks.forEach((item) => {
+      item.onResolved(data)
+    })
+  }
+
+   // reject 函数
+   function reject(data) {
+    if(_this.PromiseState === 'pending') return 
+    _this.PromiseState = 'rejected'
+    _this.PromiseResult = data;
+    _this.callbacks.forEach((item) => {
+      item.onRejected(data)
+    })
+   }
+
+  try {
+    executor(resolve, reject)
+  } catch (e) {
+    reject(e)
+  }
+}
+
+Promise.prototype.then = function(onResolved, onRejected) {
+  // if(this.PromiseState === 'fulfilled') {
+  //   onResolved(this.PromiseResult)
+  // }
+  // if(this.PromiseState === 'rejected') {
+  //   onReject(this.PromiseResult)
+  // }
+  if(this.PromiseState === 'pending') {
+    this.callbacks.push({
+      onResolved,
+      onRejected
+    })
+  }
+}
+```
+
 ## iFrame
 
 iFrame 知识总结
