@@ -110,6 +110,114 @@ Promise.prototype.then = function(onResolved, onRejected) {
 }
 ```
 
+## 深拷贝
+
+```js
+const object = {
+  a: 1,
+  b: 'qwe',
+  c: [1,2,3],
+  d: {
+    test: '',
+  }
+}
+
+JSON.parse(JSON.stringify())
+
+const deepClone = (cloneData) => {
+  if(typeof cloneData !== 'object' || obj == null) {
+    return cloneData
+  }
+
+  let result
+  if(cloneData instanceof Array) {
+    result = []
+  } else {
+    result = {}
+  }
+
+  for(let key in cloneData) {
+    // key 不是原型属性
+    if(cloneData.hasOwnProperty(key)) {
+      // 递归调用
+      result[key] = deepClone(cloneData[key])
+    }
+  }
+
+  return result
+}
+
+```
+
+## 防抖
+
+* 防止多次触发
+
+```js
+function debonce(func, delay) {
+  let timer;
+  return function () {
+    let context = this;
+    let args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function ()  {
+      func.apply(context, args)
+    }, delay)
+  }
+}
+```
+
+## 节流
+
+* 防止多次发出
+
+```js
+// setTimeOut
+function throttle(func, delay) {
+  let timer;
+  return function () {
+    if(timer) {
+      return;
+    }
+    let context = this;
+    let args = arguments;
+    timer = setTimeout(function ()  {
+      func.apply(context, args);
+      timer = null;
+    }, delay)
+  }
+}
+// Date
+function throttle(func, delay) {
+  let pre = 0;
+  return function () {
+    let context = this;
+    let args = arguments;
+    let now = new Date();
+    if(now - pre > delay) {
+      func.apply(context, args);
+      pre = now;
+    }
+  }
+}
+```
+
+## call、apply、bind
+
+```js
+// call
+Function.prototype.newCall = function(obj) {
+  var obj = obj || window;
+  obj.p = this;
+  var newArguments = [];
+  for (var i = 1; i < arguments.length; i++) {
+    newArguments.push(`argumen[${i}]`)
+  }
+  var result = eval(`obj.p(${newArguments})`)
+  delete onj.p;
+}
+```
+
 ## iFrame
 
 iFrame 知识总结
