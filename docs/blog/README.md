@@ -3,6 +3,10 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-08-04 日记
+
+![Chrome-V8](../blog/Chrome-V8.png)
+
 ## 2021-07-28 日记
 
 chrome 限制了同一个域名下同时只能有 6 个请求。
