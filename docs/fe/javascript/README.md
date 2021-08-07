@@ -5,7 +5,13 @@ sidebar: auto
 
 [JavaScript 踩坑指南](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)
 
-## 事件循环
+## event loop(事件循环/事件轮询)
+
+* JS单线程
+* 异步要基于回调来实现
+* event loop就是异步回调的实现原理
+
+JS执行步骤：从前到后，一行一行执行、错误终止执行、先执行同步，再执行异步
 
 [菲利普·罗伯茨：到底什么是Event Loop呢？ | 欧洲 JSConf 2014](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
 
