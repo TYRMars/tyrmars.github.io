@@ -271,7 +271,7 @@ fetch('/some/url',{
 ## 02-01 XSS介绍
 
 * Cross Site Scripting
-* XXS 跨站脚本攻击
+* XSS 跨站脚本攻击
 * 运行了来自别的网站的脚本！！！
 
 ### XSS攻击
