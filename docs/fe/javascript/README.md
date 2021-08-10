@@ -131,7 +131,7 @@ const object = {
 JSON.parse(JSON.stringify())
 
 const deepClone = (cloneData) => {
-  if(typeof cloneData !== 'object' || obj == null) {
+  if(typeof cloneData !== 'object' || cloneData == null) {
     return cloneData
   }
 
@@ -191,6 +191,16 @@ function debonce(func, delay) {
 * 防止多次发出
 
 ```js
+function throttle(func, delay) {
+  let timer;
+  return function () {
+    if(timer) return
+    timer = setTimeout(() => {
+      func.apply(context, arguments);
+      timer = null;
+    }, delay)
+  }
+}
 // setTimeOut
 function throttle(func, delay) {
   let timer;
