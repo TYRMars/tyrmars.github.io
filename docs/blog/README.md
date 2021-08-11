@@ -27,6 +27,9 @@ chrome 限制了同一个域名下同时只能有 6 个请求。
 解决方案一是 开启 http2 支持，http2 可以共享一个 tcp 连接，不受 6 个连接的限制。
 解决方案二是 视频请求时返回 partial-content ，比如每次只返回 5M， 这样可以把连接释放出来。
 
+* 使用service worker做相关操作，[service worker](https://developers.google.com/web/fundamentals/primers/service-workers?hl=zh-cn)
+* [预加载视频实现快速播放](https://juejin.cn/post/6844903685324029960)
+
 ## 2021-05-16 日记
 
 ### requestAniamtionFrame 遇到的问题
