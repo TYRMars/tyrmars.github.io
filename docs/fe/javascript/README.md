@@ -116,6 +116,16 @@ Promise.prototype.then = function(onResolved, onRejected) {
 }
 ```
 
+## 柯里化
+
+```js
+function curry(fn, ...arges) {
+  return fn.length <= args.length
+  ? fn(...args)
+  : curry.bind(null, fn, ...args);
+}
+```
+
 ## 深拷贝
 
 ```js
