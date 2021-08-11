@@ -3,11 +3,23 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-08-11 日记
+
+### webpack 打包内存溢出
+
+webpack 运行项目内存溢出(Last few GCs)
+
+方案记录：[webpack 运行项目内存溢出](https://blog.csdn.net/Gx0525_/article/details/114663268)
+
 ## 2021-08-04 日记
+
+### V8学习
 
 ![Chrome-V8](../blog/Chrome-V8.png)
 
 ## 2021-07-28 日记
+
+### Chrome  请求限制
 
 chrome 限制了同一个域名下同时只能有 6 个请求。
 然后这个页面上有 6 个以上的视频时，前 6 个视频开始下载，第 7 个会停在那里，等前面下载完释放一个连接出来。
