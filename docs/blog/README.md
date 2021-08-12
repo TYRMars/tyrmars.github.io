@@ -30,6 +30,8 @@ chrome 限制了同一个域名下同时只能有 6 个请求。
 * 使用service worker做相关操作，[service worker](https://developers.google.com/web/fundamentals/primers/service-workers?hl=zh-cn)
 * [预加载视频实现快速播放](https://juejin.cn/post/6844903685324029960)
 
+直播的则使用 HLS
+
 ## 2021-05-16 日记
 
 ### requestAniamtionFrame 遇到的问题
