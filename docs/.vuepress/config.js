@@ -6,7 +6,6 @@ module.exports = {
   },
   plugins: ['@vuepress/back-to-top'],
   themeConfig: {
-    sidebar: 'auto',
     nav: [
       { text: '主页', link: '/' },
       { text: '文章收藏', link: '/fe/collect/' },

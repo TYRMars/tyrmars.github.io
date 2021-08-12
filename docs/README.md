@@ -9,9 +9,19 @@ title: 主页
 
 :::
 
-## 文章列表
+## 踩坑指南系列
 
-### Node.js
+|  [![JavaScript](./fe/image/JavaScript.png)](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)   | [![react](./fe/image/React.png)](https://jonathan-zhang.gitbook.io/react-steppitguide/)  |
+|  ----  | ----  |
+| JavaScript  | React |
+
+## JavaScript
+
+[ES6学习 - ES6-StepPitGuide](https://github.com/TYRMars/ES6-StepPitGuide)
+
+[前端安全 - WebSafe-StepPitGuide](https://github.com/TYRMars/WebSafe-StepPitGuide)
+
+## Node.js
 
 [『Node.js』FFmpeg与Node.js (1) 初识FFmpeg与视频知识](https://segmentfault.com/a/1190000021366234)
 
