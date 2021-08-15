@@ -309,6 +309,17 @@ function getSearch() {
 }
 ```
 
+## EventEmitter
+
+```js
+class EventEmitter {
+  constructor() {
+    this.listeners = {};
+    this.maxListener = 10;
+  }
+}
+```
+
 ## iFrame
 
 iFrame 知识总结
