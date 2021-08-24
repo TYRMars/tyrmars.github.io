@@ -5,6 +5,15 @@ sidebar: auto
 
 [JavaScript 踩坑指南](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)
 
+## new操作符
+
+```js
+function objectFactory() {
+  let newObject = null;
+  let constructor = Array.prototype.shift.call(arguments);
+}
+```
+
 ## event loop(事件循环/事件轮询)
 
 * JS单线程
@@ -175,6 +184,18 @@ MyPromise.prototype.then = function (onFulfilled, onReject){
 ## 柯里化
 
 ```js
+function curry(func) {
+  return function curried(...args) {
+    if (args.length >= func.length) {
+      return func.apply(this, args)
+    } else {
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2));
+      }
+    }
+  }
+}
+
 function curry(fn, ...arges) {
   return fn.length <= args.length
   ? fn(...args)
@@ -323,6 +344,48 @@ Function.prototype.newCall = function(obj) {
   obj.fn = this;
   obj.fn();
   delete obj.p
+}
+```
+
+## map
+
+```js
+Array.prototype._map(fn) {
+  for (let i = 0; i < this.length; i ++) {
+    return fn(this[i]);
+  }
+}
+```
+
+## Search获取参数
+
+```js
+function getSearch(name) {
+  return (new URLSearchParams(window.location.search)).get(name)
+}
+
+function getSearch() {
+  const res = {}
+  const search = location.search.substr(1)
+  search.splite('&').forEach((paramstr) => {
+    const arr = paramStr.split('=');
+    const key = arr[0]
+    const val = arr[1]
+    res[key] = val
+  })
+
+  return res
+}
+```
+
+## EventEmitter
+
+```js
+class EventEmitter {
+  constructor() {
+    this.listeners = {};
+    this.maxListener = 10;
+  }
 }
 ```
 
