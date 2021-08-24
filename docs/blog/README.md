@@ -3,6 +3,26 @@ title: 博客
 sidebar: auto
 ---
 
+## 2022-08-24 日记
+
+lerna 构建项目，构建日志过多，触发了lerna的 ERR 和 gitlab pipeline runner 的异常
+
+```text
+lerna ERR! MaxBufferError: stdout maxBuffer exceeded
+
+Job's log exceeded limit of 4194304 bytes.
+```
+
+解决方案
+
+[lerna bootstrap error](https://github.com/lerna/lerna/issues/278)
+
+E.g. lerna bootstrap --npm-client-flags --logger=off
+
+Tried lerna bootstrap --concurrency=1 --max-buffer=99999999999999 and it still gives me exceeded error.
+
+[gitlab pipelines job执行时日志较大报错](https://www.cnblogs.com/baishuchao/p/8783179.html)
+
 ## 2021-08-11 日记
 
 ### webpack 打包内存溢出
