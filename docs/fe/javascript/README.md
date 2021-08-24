@@ -64,55 +64,111 @@ const handlerClick = () => {
 ## 自定义promise
 
 ```js
-function Promise(executor){
-  this.PromiseState = 'pending';
-  this.PromiseResult = null;
-  this.callbacks = [];
+function MyPromise(executor) {
+  // 保存初始化状态
+  var self = this;
 
-  const _this = this;
+  // 初始化状态
+  this.state = PENDING;
 
-  // resolve 函数
-  function resolve(data) {
-    // 修改对象状态
-    if(_this.PromiseState === 'pending') return
-    _this.PromiseState = 'fulfiled'
-    // 设置对象结果值
-    _this.PromiseResult = data;
-    _this.callbacks.forEach((item) => {
-      item.onResolved(data)
-    })
+  // 用于保存 resolve 或者 rejected 传入的值
+  this.value = null;
+
+  // 用于保存 resolve 的回调函数
+  this.resolvedCallbacks = [];
+
+  // 用于保存 reject 的回调函数
+  this.rejectedCallbacks = [];
+
+  // 状态转变为 resolved 方法
+  function resolve(value) {
+    // 判断传入元素是否为 Promise 值，如果是，则状态改变必须等待前一个状态改变后再进行改变
+    if (value instanceof MyPromise) {
+      return value.then(resolve, reject);
+    }
+
+    // 保证代码的执行顺序为本轮事件循环的末尾
+    setTimeout(() => {
+      // 只有状态为 pending 时才能转变，
+      if (self.state === PENDING) {
+        // 修改状态
+        self.state = RESOLVED;
+
+        // 设置传入的值
+        self.value = value;
+
+        // 执行回调函数
+        self.resolvedCallbacks.forEach(callback => {
+          callback(value);
+        });
+      }
+    }, 0);
   }
 
-   // reject 函数
-   function reject(data) {
-    if(_this.PromiseState === 'pending') return 
-    _this.PromiseState = 'rejected'
-    _this.PromiseResult = data;
-    _this.callbacks.forEach((item) => {
-      item.onRejected(data)
-    })
-   }
+  // 状态转变为 rejected 方法
+  function reject(value) {
+    // 保证代码的执行顺序为本轮事件循环的末尾
+    setTimeout(() => {
+      // 只有状态为 pending 时才能转变
+      if (self.state === PENDING) {
+        // 修改状态
+        self.state = REJECTED;
 
+        // 设置传入的值
+        self.value = value;
+
+        // 执行回调函数
+        self.rejectedCallbacks.forEach(callback => {
+          callback(value);
+        });
+      }
+    }, 0);
+  }
+
+  // 将两个方法传入函数执行
   try {
-    executor(resolve, reject)
+    fn(resolve, reject);
   } catch (e) {
-    reject(e)
+    // 遇到错误时，捕获错误，执行 reject 函数
+    reject(e);
   }
 }
 
-Promise.prototype.then = function(onResolved, onRejected) {
-  // if(this.PromiseState === 'fulfilled') {
-  //   onResolved(this.PromiseResult)
-  // }
-  // if(this.PromiseState === 'rejected') {
-  //   onReject(this.PromiseResult)
-  // }
-  if(this.PromiseState === 'pending') {
-    this.callbacks.push({
-      onResolved,
-      onRejected
-    })
-  }
+MyPromise.prototype.then = function (onFulfilled, onReject){
+  // 保存前一个promise的this
+  const self = this; 
+  return new MyPromise((resolve, reject) => {
+    // 封装前一个promise成功时执行的函数
+    let fulfilled = () => {
+      try{
+        const result = onFulfilled(self.value); // 承前
+        return result instanceof MyPromise? result.then(resolve, reject) : resolve(result); //启后
+      }catch(err){
+        reject(err)
+      }
+    }
+    // 封装前一个promise失败时执行的函数
+    let rejected = () => {
+      try{
+        const result = onReject(self.reason);
+        return result instanceof MyPromise? result.then(resolve, reject) : reject(result);
+      }catch(err){
+        reject(err)
+      }
+    }
+    switch(self.status){
+      case PENDING: 
+        self.onFulfilledCallbacks.push(fulfilled);
+        self.onRejectedCallbacks.push(rejected);
+        break;
+      case FULFILLED:
+        fulfilled();
+        break;
+      case REJECT:
+        rejected();
+        break;
+    }
+  })
 }
 ```
 
@@ -245,15 +301,28 @@ function throttle(func, delay) {
 
 ```js
 // call
+// Function.prototype.newCall = function(obj) {
+//   var obj = obj || window;
+//   obj.p = this;
+//   var newArguments = [];
+//   for (var i = 1; i < arguments.length; i++) {
+//     newArguments.push(`argumen[${i}]`)
+//   }
+//   var result = eval(`obj.p(${newArguments})`)
+//   delete onj.p;
+// }
+
+// // apply
+// Function.prototype.newApplay = function(context) {
+//   let result = null;
+// }
+
 Function.prototype.newCall = function(obj) {
-  var obj = obj || window;
-  obj.p = this;
-  var newArguments = [];
-  for (var i = 1; i < arguments.length; i++) {
-    newArguments.push(`argumen[${i}]`)
-  }
-  var result = eval(`obj.p(${newArguments})`)
-  delete onj.p;
+  let result = null;
+  let args = argument.slice(1)
+  obj.fn = this;
+  obj.fn();
+  delete obj.p
 }
 ```
 
