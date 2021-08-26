@@ -13,6 +13,10 @@ sidebar: auto
 * [node-gyp 实现 nodejs 调用 C++](https://juejin.cn/post/6844903971220357134)
 * 使用 [node-lame don't need lame](https://github.com/TooTallNate/node-lame) LAME 是一种开源编码器，可将音频编码和解码为 MP3 文件格式。编码器读取 WAV、MP1、MP2 和 MP3 格式并将其编码为 MP3 文件。解码器读取 MP3 格式并将其解码为 WAV。
 
+[ffmpeg解决方案](https://stackoverflow.com/questions/47848621/how-can-i-bundle-ffmpeg-in-an-electron-application)
+
+[node-fluent-ffmpeg 需要注意](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/998)
+
 ## 2021-08-24 日记
 
 ### lerna 构建项目异常
