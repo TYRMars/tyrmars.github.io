@@ -3,9 +3,21 @@ title: 博客
 sidebar: auto
 ---
 
-## 2022-08-24 日记
+## 2021-08-26 日记
 
-lerna 构建项目，构建日志过多，触发了lerna的 ERR 和 gitlab pipeline runner 的异常
+### electron mp3转 wav
+
+* 读取本地文件路径
+* 文件分片读取fs.createReadStream
+* [node-lame need lame](https://github.com/devowlio/node-lame)
+* [node-gyp 实现 nodejs 调用 C++](https://juejin.cn/post/6844903971220357134)
+* 使用 [node-lame don't need lame](https://github.com/TooTallNate/node-lame) LAME 是一种开源编码器，可将音频编码和解码为 MP3 文件格式。编码器读取 WAV、MP1、MP2 和 MP3 格式并将其编码为 MP3 文件。解码器读取 MP3 格式并将其解码为 WAV。
+
+## 2021-08-24 日记
+
+### lerna 构建项目异常
+
+构建日志过多，触发了lerna的 ERR 和 gitlab pipeline runner 的异常
 
 ```text
 lerna ERR! MaxBufferError: stdout maxBuffer exceeded
