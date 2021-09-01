@@ -8,9 +8,14 @@ sidebar: auto
 ## new操作符
 
 ```js
-function objectFactory() {
-  let newObject = null;
-  let constructor = Array.prototype.shift.call(arguments);
+function new(func, ...args) {
+  const newObject = Object.create(func.prototype);
+  const k = func.apply(newObject, ...args)
+  if(typeof k === 'object') {
+    return k
+  } else {
+    return newObject
+  }
 }
 ```
 
