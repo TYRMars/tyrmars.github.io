@@ -67,6 +67,8 @@ sidebar: auto
 
 [webassembly](http://webassembly.org.cn/)
 
+[EventLoop](https://mp.weixin.qq.com/s/UrCAH6X4qpOw41RO6v_BaQ)
+
 ## HTTP
 
 [HTTP2讲解](https://ye11ow.gitbooks.io/http2-explained/content/)

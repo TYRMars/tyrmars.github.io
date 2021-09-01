@@ -3,6 +3,42 @@ title: 博客
 sidebar: auto
 ---
 
+## 2021-08-26 日记
+
+### electron mp3转 wav
+
+* 读取本地文件路径
+* 文件分片读取fs.createReadStream
+* [node-lame need lame](https://github.com/devowlio/node-lame)
+* [node-gyp 实现 nodejs 调用 C++](https://juejin.cn/post/6844903971220357134)
+* 使用 [node-lame don't need lame](https://github.com/TooTallNate/node-lame) LAME 是一种开源编码器，可将音频编码和解码为 MP3 文件格式。编码器读取 WAV、MP1、MP2 和 MP3 格式并将其编码为 MP3 文件。解码器读取 MP3 格式并将其解码为 WAV。
+
+[ffmpeg解决方案](https://stackoverflow.com/questions/47848621/how-can-i-bundle-ffmpeg-in-an-electron-application)
+
+[node-fluent-ffmpeg 需要注意](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/998)
+
+## 2021-08-24 日记
+
+### lerna 构建项目异常
+
+构建日志过多，触发了lerna的 ERR 和 gitlab pipeline runner 的异常
+
+```text
+lerna ERR! MaxBufferError: stdout maxBuffer exceeded
+
+Job's log exceeded limit of 4194304 bytes.
+```
+
+解决方案
+
+[lerna bootstrap error](https://github.com/lerna/lerna/issues/278)
+
+E.g. lerna bootstrap --npm-client-flags --logger=off
+
+Tried lerna bootstrap --concurrency=1 --max-buffer=99999999999999 and it still gives me exceeded error.
+
+[gitlab pipelines job执行时日志较大报错](https://www.cnblogs.com/baishuchao/p/8783179.html)
+
 ## 2021-08-11 日记
 
 ### webpack 打包内存溢出
