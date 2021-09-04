@@ -18,9 +18,9 @@ title: 主页
 
 ## 踩坑指南系列
 
-|  [![JavaScript](./fe/image/JavaScript.png)](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)   | [![react](./fe/image/React.png)](https://jonathan-zhang.gitbook.io/react-steppitguide/)  |
-|  ----  | ----  |
-| JavaScript  | React |
+|  [![JavaScript](./fe/image/JavaScript.png)](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)   | [![react](./fe/image/React.png)](https://jonathan-zhang.gitbook.io/react-steppitguide/)  | [![webpack](./fe/image/WebPack.png)](https://jonathan-zhang.gitbook.io/webpack-steppitguide/) |
+|  ----  | ----  | ---- |
+| JavaScript  | React | Webpack |
 
 ## JavaScript
 
