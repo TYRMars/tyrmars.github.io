@@ -387,9 +387,40 @@ function getSearch() {
 
 ```js
 class EventEmitter {
-  constructor() {
+  constructor(defaultMaxListeners = 50) {
     this.listeners = {};
-    this.maxListener = 10;
+    this.defaultMaxListeners = defaultMaxListeners;
+  }
+
+  on(eventName, fn) {
+    if (!this.listener[eventName]) {
+      this.listeners[eventName] = [];
+    }
+    if(this.listeners[eventName].length > this.defaultMaxListeners) {
+      throw new Error('超出限制');
+    }
+    this.listeners[eventName].push(fn);
+  }
+
+  off(eventName, fn) {
+    let callbacks = this.listener[eventName];
+    if(!callbacks) return false;
+    if(!fn) {
+      callbacks = [];
+    } else {
+      for(let i = 0; i< callbacks.length; i++) {
+        if(callbacks[i] === fn) {
+          callbacks.splice(i,1)
+          i--;
+        }
+      }
+    }
+  }
+
+  once(eventName, fn) {
+    const on = (...args) => {
+
+    }
   }
 }
 ```
