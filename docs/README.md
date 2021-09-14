@@ -18,10 +18,11 @@ title: 主页
 
 ## 踩坑指南系列
 
-|  [![JavaScript](./fe/image/JavaScript.png)](https://jonathan-zhang.gitbook.io/javascript-steppitguide/)   | [![react](./fe/image/React.png)](https://jonathan-zhang.gitbook.io/react-steppitguide/)  | [![webpack](./fe/image/WebPack.png)](https://jonathan-zhang.gitbook.io/webpack-steppitguide/) |
-|  ----  | ----  | ---- |
-| JavaScript  | React | Webpack |
-
+|  [![JavaScript](./fe/image/JavaScript.png)](https://jonathan-zhang.gitbook.io/javascript-steppitguide/) | [![react](./fe/image/React.png)](https://jonathan-zhang.gitbook.io/react-steppitguide/)  |
+|  ----  | ----  |
+| JavaScript  | React |
+|[![webpack](./fe/image/WebPack.png)](https://jonathan-zhang.gitbook.io/webpack-steppitguide/) | [![node](./fe/image/Node.png)](https://jonathan-zhang.gitbook.io/nodejs-steppitguide/)
+| Webpack (逐步完善中)  | Node.js (逐步完善中) |
 ## JavaScript
 
 [ES6学习 - ES6-StepPitGuide](https://github.com/TYRMars/ES6-StepPitGuide)
